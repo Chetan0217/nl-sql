@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+.pytest_cache/
+
+# Local settings and secrets (never upload)
+local-settings.cmd
+.env
+*.env
+
+# Website history exports and local data
+nlsql-history*.json
+nlsql-result*.csv
+*.sqlite
+*.db
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

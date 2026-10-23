@@ -1,0 +1,13 @@
+# Business rules for the nlsql_demo retail database.
+# One rule per line. Lines starting with # are ignored.
+# These are sent to the model with every question. Edit them in the website's
+# "Business rules" tab or in this file, then the next question uses them.
+
+Revenue or sales means SUM(order_items.quantity * order_items.unit_price). Never use products.list_price for money that was actually charged; list_price is only the catalogue price.
+Exclude orders with orders.status = 'cancelled' from revenue, sales, spend and order counts.
+Net revenue means revenue minus SUM(returns.refund_amount) for the same order items.
+Profit means SUM(order_items.quantity * (order_items.unit_price - products.unit_cost)) on non-cancelled orders.
+The date of a sale is orders.ordered_at. "In 2025" means ordered_at >= '2025-01-01' and ordered_at < '2026-01-01'.
+Online orders have orders.store_id = NULL, so use a LEFT JOIN to stores when a question covers all channels.
+An active customer has customers.is_active = 1.
+A customer's region comes from the store of their orders (orders.store_id -> stores.region_id -> regions.id); customers have no region column.

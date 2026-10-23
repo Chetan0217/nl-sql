@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>nlsql: plain language ⇄ SQL</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%235b5bd6'/%3E%3Ctext x='16' y='22' font-size='16' text-anchor='middle' fill='white' font-family='sans-serif'%3E%E2%87%84%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/static/style.css">
+  <!-- Set the saved theme before the page paints, so it never flashes the wrong colours. -->
+  <script>let t = "dark"; try { t = localStorage.getItem("nlsql-theme") || "dark"; } catch (e) {} if (t === "auto") delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = t;</script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">⇄</span>
+      <div>
+        <div class="brand-name">nlsql</div>
+        <div class="brand-sub">plain language ⇄ SQL · runs on this computer</div>
+      </div>
+    </div>
+    <div id="status" class="pills"><span class="pill">Connecting…</span></div>
+    <div class="top-actions">
+      <button id="sidebar-btn" class="icon-btn" title="Show or hide the schema (S)">☰</button>
+      <button id="theme-btn" class="icon-btn" title="Light / dark / follow Windows">◐</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <!-- ============ Sidebar: schema explorer ============ -->
+    <aside id="sidebar" class="sidebar">
+      <div class="side-head">
+        <h2>Schema</h2>
+        <button id="schema-reload" class="link-btn" title="Read the tables again from the database">Reload</button>
+      </div>
+      <input id="schema-filter" class="search" type="search" placeholder="Find a table or column…">
+      <p class="hint">Click a name to put it into what you're typing.</p>
+      <div id="schema-tree" class="tree"></div>
+    </aside>
+
+    <main>
+      <nav class="tabs" role="tablist">
+        <button class="tab active" data-tab="ask">Ask <kbd>1</kbd></button>
+        <button class="tab" data-tab="explain">Explain SQL <kbd>2</kbd></button>
+        <button class="tab" data-tab="history">History <span id="history-count" class="count">0</span> <kbd>3</kbd></button>
+        <button class="tab" data-tab="rules">Business rules <kbd>4</kbd></button>
+      </nav>
+
+      <!-- ============ Ask: question -> SQL ============ -->
+      <section id="tab-ask" class="panel">
+        <div class="hero">
+          <h1>Ask your database a question</h1>
+          <p class="muted">Plain English in, checked read-only SQL and the answer out.</p>
+          <div class="ask-box">
+            <textarea id="question" rows="2" placeholder="e.g. Which product category earned the most in 2025?"></textarea>
+            <button id="ask-btn" class="primary big">Translate <kbd>Ctrl ⏎</kbd></button>
+          </div>
+          <div class="ask-options">
+            <label class="toggle"><input type="checkbox" id="run" checked><span></span> Run it and show the rows</label>
+            <label class="toggle"><input type="checkbox" id="answer-words" checked><span></span> Answer in plain words</label>
+            <label class="toggle"><input type="checkbox" id="check-meaning"><span></span> Double-check the meaning (slower)</label>
+          </div>
+          <div class="examples" id="examples"></div>
+        </div>
+        <div id="ask-out" class="out"></div>
+      </section>
+
+      <!-- ============ Explain: SQL -> plain language ============ -->
+      <section id="tab-explain" class="panel hidden">
+        <div class="card">
+          <div class="card-head">
+            <h2>Paste a SQL query</h2>
+            <label class="inline">Dialect <select id="dialect"></select></label>
+          </div>
+          <textarea id="sql-in" rows="9" class="code" placeholder="SELECT ..."></textarea>
+          <div class="row">
+            <button id="explain-btn" class="primary">Explain in plain language</button>
+            <button id="run-sql-btn">Run it (read-only)</button>
+            <button id="format-btn" class="ghost">Tidy formatting</button>
+          </div>
+        </div>
+        <div id="explain-out" class="out"></div>
+      </section>
+
+      <!-- ============ History ============ -->
+      <section id="tab-history" class="panel hidden">
+        <div class="card-head">
+          <h2>Past questions</h2>
+          <div class="row tight">
+            <input id="history-filter" class="search" type="search" placeholder="Search history…">
+            <button id="history-export" class="ghost" title="Save as JSON: a start for an accuracy test set">Export</button>
+            <button id="history-clear" class="ghost danger">Clear</button>
+          </div>
+        </div>
+        <p class="hint">Stored only in this browser. Re-run uses the saved SQL, so it is instant and skips the model.
+          Mark answers right or wrong: the export becomes your accuracy test set.</p>
+        <div id="history-list"></div>
+      </section>
+
+      <!-- ============ Business rules ============ -->
+      <section id="tab-rules" class="panel hidden">
+        <div class="card">
+          <div class="card-head">
+            <h2>Business rules</h2>
+            <span id="rules-msg" class="muted small"></span>
+          </div>
+          <p class="muted">Sent to the model with every question and explanation. Write what the schema can't say on its own,
+            one rule per line. Lines starting with <code>#</code> are ignored.</p>
+          <textarea id="rules-text" rows="16" class="code"></textarea>
+          <div class="row">
+            <button id="rules-save" class="primary">Save rules</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="toasts" class="toasts" aria-live="polite"></div>
+  <div id="tooltip" class="tooltip hidden"></div>
+  <script src="/static/app.js"></script>
+</body>
+</html>
